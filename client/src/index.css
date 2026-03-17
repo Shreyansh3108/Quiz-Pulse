@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* If the screen is still blank, let's add a temporary backup 
+   to see if CSS is working at all */
+body {
+  background-color: #0f172a !important;
+}
