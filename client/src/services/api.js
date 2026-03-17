@@ -1,13 +1,8 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://quiz-pulse-api.onrender.com/api',
+  // Use the exact URL from your Render dashboard screenshot
+  baseURL: 'https://quiz-pulse-zr61.onrender.com', 
 });
-
-export const fetchQuestions = (category, subtopic) => 
-  API.get(`/questions`, { params: { category, subtopic } });
-
-export const fetchSubtopics = (category) => 
-  API.get(`/subtopics/${category}`);
 
 export default API;

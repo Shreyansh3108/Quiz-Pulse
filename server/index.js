@@ -3,36 +3,42 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const Question = require('./models/Question'); 
-const User = require('./models/User'); // Import the new User model
+const User = require('./models/User');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
-app.use(cors());
+// --- UPDATED CORS FOR VERCEL ---
+app.use(cors({
+  origin: [
+    "http://localhost:5173", 
+    "https://quiz-pulse-three.vercel.app" // Your specific Vercel URL
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
 
 const mongoURI = process.env.MONGODB_URL;
 
 if (!mongoURI) {
-  console.error("ERROR: MONGODB_URL is not defined in your .env file!");
-  process.exit(1);
+  console.error("ERROR: MONGODB_URL is not defined!");
+  // In production, we don't exit(1) immediately to allow logs to persist
 }
 
 mongoose.connect(mongoURI)
   .then(() => console.log("MongoDB Connected Successfully"))
   .catch((err) => {
     console.error("MongoDB Connection Error:", err);
-    process.exit(1);
   });
 
 // --- BASE ROUTE ---
 app.get('/', (req, res) => {
-  res.send("Quiz Pulse API is running...");
+  res.send("Quiz Pulse API is running live...");
 });
 
 // --- AUTH ROUTES ---
-
-// Signup
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -48,7 +54,6 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 });
 
-// Login
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -63,17 +68,12 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // --- QUESTION ROUTES ---
-
 app.get('/api/questions', async (req, res) => {
   try {
     const { category, subtopic } = req.query;
-    
     const filter = {};
     if (category) filter.category = category;
     if (subtopic) filter.subtopic = subtopic;
-
-    // DEBUG LOG: Check your terminal to see if subtopic is being passed correctly
-    console.log("Fetching questions with filter:", filter);
 
     const questions = await Question.find(filter);
     res.json(questions);
@@ -94,5 +94,5 @@ app.get('/api/subtopics/:category', async (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
